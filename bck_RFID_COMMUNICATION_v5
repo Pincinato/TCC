@@ -1,0 +1,337 @@
+#include "RFID_Communication.h"
+#include <QDebug>
+#include <string.h>
+#include <unistd.h>
+#include<fcntl.h>
+#define DEBUG 1
+#define delay_serial 100
+
+RFID_Communication::RFID_Communication(QObject *parent) : QThread(parent)
+{
+    mutexWaitCmd.lock();
+    isRuning = false;
+    printf("\n blz \n");
+}
+
+RFID_Communication::~RFID_Communication(){
+
+}
+
+void RFID_Communication::run()
+{
+
+    mutexWaitThreadEnd.lock();
+    qDebug() << "THread started!\n";
+    while(isRuning)
+    {
+        this->read_informations_Tag();
+        //sleep(1);
+        /*for(int i=0;i<47;i++){
+            for(int w=0;w<16;w++)
+                data_write[w+16*i]=(char)(i+48);
+        }
+        data_write[752]='\0';
+        this->write_informations_Tag(data_write,strlen(&data_write[0]));
+        */isRuning=false;
+    }
+    mutexWaitThreadEnd.unlock();
+    qDebug() << "THread stoped!\n";
+}
+
+
+int RFID_Communication::connect(char *nomePorta)
+{
+    printf("Connect RFID \n");
+    if(!serialObj.is_Open())
+    {
+      if(serialObj.Open(nomePorta) != Fail)
+        {
+          printf("\n Porta serial connectada!!\n");
+            return 0;
+        }
+        else
+        {
+            printf( "\n Erro Conectando a porta serial\n");
+            return -1; 
+        }
+    }
+    else
+    {
+        printf("\n porta serial ja conectada! \n");
+        return -2;   
+    }
+}
+
+void RFID_Communication::disconnect()
+{
+    if(serialObj.is_Open())
+    {
+    serialObj.Close();
+    }
+    qDebug() << "\n  porta serial fechada\n";
+}
+
+
+int RFID_Communication::read_informations_Tag()
+{
+    if(serialObj.is_Open())
+    {
+        if(DEBUG){
+            printf("read_information \n");
+        }
+        unsigned char buffer[64]={0};
+        unsigned char Acknowledgement[5]={0};
+        int q_dados_lidos=0;
+        int tentativas=0;
+        information.clear();
+        int n_block=0;
+        buffer[0]=0;
+        strcpy((char*)&buffer[0],Request_Read);
+        buffer[4]='\n';
+        buffer[5]=0;
+        if(DEBUG){
+             printf("Mensagem a ser escrita no buffer %s de tamanho %d \n",&buffer[0],sizeof(&buffer));
+        }
+        //this->calc_CRC(&buffer[0],sizeof(Request_Read));
+        serialObj.Write(&buffer[0],4);
+        this->wait_response(&buffer[0]);
+        if(strcmp((char*)&buffer[0],(char*)ACK)!=0)
+        {
+            printf("ACK \n");
+            buffer[0]=0;
+            strcpy((char*)&buffer[0],Command_Read);
+            buffer[4]='\n';
+            buffer[5]=0;
+            do{
+                if(DEBUG){
+                     printf("\nMensagem a ser escrita no buffer %s de tamanho %d \n",&buffer[0],sizeof(&buffer));
+                }
+                serialObj.Write(&buffer[0],4);
+                q_dados_lidos=this->wait_response(&buffer[0]);
+                for(int w=0;w<3;w++)
+                    Acknowledgement[w]=buffer[w];
+                Acknowledgement[3]='\n';
+                Acknowledgement[4]='\0';
+                if(DEBUG){
+                    printf("Acknowledgement = %s \n",&Acknowledgement[0]);
+                    printf("buffer obtido %s ",&buffer[0]);
+                    printf("\nValor da comparacao dos acks %d \n",strcmp((char*)&Acknowledgement[0],Response_Acknowledgement));
+                }
+                if(strcmp((char*)&Acknowledgement[0],"END\n")==0){
+                    if(n_block!=64){
+                        printf("Mensagem chegou ao final antes de terminar a leitura");
+                        return -1;
+                        }
+
+                }
+                else if(strcmp((char*)&Acknowledgement[0],Response_Acknowledgement)!=0)
+                {
+                    if(DEBUG){
+                        printf("Erro na serial no bloco %d \n",n_block);
+                    }
+                    if(tentativas<3 && n_block>0)
+                    {
+                        strcpy((char*)&buffer[0],NACK);
+                        tentativas++;
+                    }
+                    else{
+                        printf("Card not found \n");
+                        return -1;
+                    }
+
+                }
+                else if(strcmp((char*)&Acknowledgement[0],Response_Acknowledgement)==0){
+                    for(int y=0;y<(q_dados_lidos-5);y++) // -5 para tira o \n
+                        buffer[y]=buffer[y+4];
+                    buffer[q_dados_lidos-5]='\0';
+                    information.append((char*)&buffer[0]);
+                    strcpy((char*)&buffer[0],ACK);
+                    if(DEBUG){
+                        printf("bloco %d copiado com sucesso \n",n_block);
+                    }
+                }
+                n_block++;
+            }while(n_block<=64);
+            information.append("\n");
+            information.append("\0");
+          }
+        else{
+            printf("NACK \n");
+            //this->show_error(buffer[0]);
+        }
+    }
+    //isRuning=false;
+    if(!DEBUG){
+        printf("\n Dados lidos %s \n de tamanho %d",&information[0],information.size());
+    }
+    return 1;
+}
+
+int RFID_Communication::write_informations_Tag(string bufferToWrite, int size)
+{
+
+    if(serialObj.is_Open())
+    {
+        int ACK_USB;
+        printf("write informations \n");
+        unsigned char buffer[64]={0};
+        unsigned char buffer_to_copy[17]={0};
+        unsigned char Acknowledgement[5]={0};
+        char n_of_block=0x01;
+        int control_copy=0;
+        bool Fim= false;
+        if(size>=752){
+         if(DEBUG){
+                printf("Inforamtion received \n%s\n  With size of %d",&bufferToWrite[0],size);
+         }
+         do{
+         buffer[0]=0;
+         strcpy((char*)&buffer[0],Request_Write);
+         buffer[4]='\n';
+         buffer[5]=0;
+         if(DEBUG){
+            printf("Mensagem a ser escrita no buffer %s de tamanho %d \n",&buffer[0],sizeof(&buffer));
+         }
+         ACK_USB=serialObj.Write(&buffer[0],4);
+         if(ACK_USB==0)
+            printf("Error in write to USB \n");
+         this->wait_response(&buffer[0]);
+         for(int w=0;w<4;w++)
+            Acknowledgement[w]=buffer[w];
+         Acknowledgement[4]='\0';
+         if(strcmp((char*)&Acknowledgement[0],ACK)==0)
+         {
+            printf("ACK");
+            buffer[0]='\0';
+            strcpy((char*)&buffer[0],Command_Write);
+            buffer[3]=n_of_block;
+            if(control_copy*16+16<=size){
+                for(int q=0;q<16;q++)
+                 {
+                     buffer_to_copy[q]=bufferToWrite[q+16*control_copy];
+                  }
+                 if(control_copy*16+16==size)
+                   {
+                        Fim=true;
+                    }
+            }
+            else{
+                    size=size-control_copy*16;
+                    for(int q=0;q<size;q++)
+                        buffer_to_copy[q]=bufferToWrite[q+16*control_copy];
+                    for(int q=size;q<16;q++)
+                        buffer_to_copy[q]='!';
+                    Fim=true;
+            }
+            buffer_to_copy[16]='\0';
+            strcpy((char *)&buffer[4],(char*)&buffer_to_copy[0]);
+            buffer[20]='\n';
+            buffer[21]='\0';
+            if(DEBUG){
+                printf("Mensagem a ser escrita no buffer %s de tamanho %d \n",&buffer[0],strlen((char*)(&buffer[0])));
+            }
+            ACK_USB=serialObj.Write(&buffer[0],20);
+            this->wait_response(&buffer[0]);
+            for(int w=0;w<4;w++)
+                Acknowledgement[w]=buffer[w];
+            Acknowledgement[4]='\0';
+            if(strcmp((char*)&Acknowledgement[0],ACK)==0)
+                {
+                    printf("AK\n");
+                    if(DEBUG){
+                        printf("Escrita no block %d efetuada com sucesso\n",(int)n_of_block);
+                    }
+                    n_of_block++;
+                    if((n_of_block+1)%4==0)
+                        n_of_block++;
+                    control_copy++;
+             }
+             else{
+                    printf("NK");
+                    if(DEBUG){
+                        printf("Erro escrita no block %d \n",(int)n_of_block);
+                    }
+                    Fim=true;
+             }
+         }
+         else{
+            printf("NACK\n");
+            return -1;
+         }
+        }while(!Fim && n_of_block<64);
+      }
+      else{
+            printf("Memory so short to salve all datas\nsize of data = %d \n",size);
+            return -1;
+      }
+    }
+    else{
+        return -1;
+    }
+
+    //isRuning=false;
+    return 0;
+
+
+}
+
+
+void RFID_Communication::start_thread()
+{
+    isRuning = true;
+    this->start();
+}
+
+void RFID_Communication::stop_thread()
+{
+    isRuning = false;
+    mutexWaitThreadEnd.lock();
+    mutexWaitThreadEnd.unlock();
+}
+
+int RFID_Communication::wait_response(unsigned char * buf)
+{
+    if(DEBUG)
+        printf("wait_response \n");
+    int i=0;
+    int aux=0;
+    int aux2=0;
+    do
+    {
+       usleep(delay_serial);
+       if(DEBUG){
+       printf("Lendo a serial\n");
+       }
+       if(serialObj.is_Open()){
+           aux=serialObj.Read(&buf[aux2]);
+           if(DEBUG){
+           printf("aux %d \n",aux);
+            }
+       }
+
+       else{
+            printf("Erro, serial estava fechada \n");
+            isRuning=false;
+        }
+       i++;
+    }while(i<50 && aux<1);
+    usleep(delay_serial);
+    while(aux>0){
+        aux2++;
+        if(aux2>=64)
+        {
+            return -1;
+        }
+        aux=serialObj.Read(&buf[aux2]);
+    }
+    if(i==50)
+    {
+        return -1;
+    }
+    buf[aux2]='\0';
+    if(DEBUG){
+        printf("Mensagem lida da serial = %s",buf);
+        printf("com aux2 = %d \n",aux2-1);
+    }
+    return aux2-1;
+}

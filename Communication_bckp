@@ -49,15 +49,15 @@ const int NRSTPD = 5;
 
 //------------------MFRC522 Register---------------
 //Page 0:Command and Status
-#define     Reserved00            0x00    
-#define     CommandReg            0x01    
-#define     CommIEnReg            0x02    
-#define     DivlEnReg             0x03    
-#define     CommIrqReg            0x04    
+#define     Reserved00            0x00
+#define     CommandReg            0x01
+#define     CommIEnReg            0x02
+#define     DivlEnReg             0x03
+#define     CommIrqReg            0x04
 #define     DivIrqReg             0x05
-#define     ErrorReg              0x06    
-#define     Status1Reg            0x07    
-#define     Status2Reg            0x08    
+#define     ErrorReg              0x06
+#define     Status1Reg            0x07
+#define     Status2Reg            0x08
 #define     FIFODataReg           0x09
 #define     FIFOLevelReg          0x0A
 #define     WaterLevelReg         0x0B
@@ -65,7 +65,7 @@ const int NRSTPD = 5;
 #define     BitFramingReg         0x0D
 #define     CollReg               0x0E
 #define     Reserved01            0x0F
-//Page 1:Command     
+//Page 1:Command
 #define     Reserved10            0x10
 #define     ModeReg               0x11
 #define     TxModeReg             0x12
@@ -82,8 +82,8 @@ const int NRSTPD = 5;
 #define     Reserved13            0x1D
 #define     Reserved14            0x1E
 #define     SerialSpeedReg        0x1F
-//Page 2:CFG    
-#define     Reserved20            0x20  
+//Page 2:CFG
+#define     Reserved20            0x20
 #define     CRCResultRegM         0x21
 #define     CRCResultRegL         0x22
 #define     Reserved21            0x23
@@ -99,7 +99,7 @@ const int NRSTPD = 5;
 #define     TReloadRegL           0x2D
 #define     TCounterValueRegH     0x2E
 #define     TCounterValueRegL     0x2F
-//Page 3:TestRegister     
+//Page 3:TestRegister
 #define     Reserved30            0x30
 #define     TestSel1Reg           0x31
 #define     TestSel2Reg           0x32
@@ -109,12 +109,12 @@ const int NRSTPD = 5;
 #define     AutoTestReg           0x36
 #define     VersionReg            0x37
 #define     AnalogTestReg         0x38
-#define     TestDAC1Reg           0x39  
-#define     TestDAC2Reg           0x3A   
-#define     TestADCReg            0x3B   
-#define     Reserved31            0x3C   
-#define     Reserved32            0x3D   
-#define     Reserved33            0x3E   
+#define     TestDAC1Reg           0x39
+#define     TestDAC2Reg           0x3A
+#define     TestADCReg            0x3B
+#define     Reserved31            0x3C
+#define     Reserved32            0x3D
+#define     Reserved33            0x3E
 #define     Reserved34		  0x3F
 //-----------------------------------------------
 
@@ -130,7 +130,7 @@ uchar  moneyConsume = 18 ;  //Consumption of 18 yuan
 uchar  moneyAdd = 10 ;  //Recharge 10 yuan
 //Sector A password, 16 sectors, each sector password 6Byte
  uchar sectorKey[7] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,0xFF};
- 
+
  uchar sectorKeyA[16][16] = {{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
                              {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
                              //{0x19, 0x84, 0x07, 0x15, 0x76, 0x14},
@@ -148,12 +148,12 @@ int control_buffer;
 int control_leitura;
 int control_escrita;
 
-void setup() {       
-  
-  
+void setup() {
+
+
   // start the SPI library:
    SPI.begin();
-  pinMode(chipSelectPin,OUTPUT);             // Set digital pin 10 as OUTPUT to connect it to the RFID /ENABLE pin 
+  pinMode(chipSelectPin,OUTPUT);             // Set digital pin 10 as OUTPUT to connect it to the RFID /ENABLE pin
     digitalWrite(chipSelectPin, LOW);          // Activate the RFID reader
   pinMode(NRSTPD,OUTPUT);  // Set digital pin 10 , Not Reset and Power-down
   digitalWrite(NRSTPD, HIGH);
@@ -180,11 +180,11 @@ void Write_MFRC522(uchar addr, uchar val)
 {
         digitalWrite(chipSelectPin, LOW);
 
-	//Address Formatï¼š0XXXXXX0
-	SPI.transfer((addr<<1)&0x7E);	
-	SPI.transfer(val);
-	digitalWrite(chipSelectPin, HIGH);
-        
+    //Address Formatï¼š0XXXXXX0
+    SPI.transfer((addr<<1)&0x7E);
+    SPI.transfer(val);
+    digitalWrite(chipSelectPin, HIGH);
+
 }
 
 
@@ -196,15 +196,15 @@ void Write_MFRC522(uchar addr, uchar val)
  */
 uchar Read_MFRC522(uchar addr)
 {
-	uchar val;
-	digitalWrite(chipSelectPin, LOW);
+    uchar val;
+    digitalWrite(chipSelectPin, LOW);
 
-	//Address Formatï¼š1XXXXXX0
-	SPI.transfer(((addr<<1)&0x7E) | 0x80);	
-	val =SPI.transfer(0x00);
-	
-	digitalWrite(chipSelectPin, HIGH);
-	return val;	
+    //Address Formatï¼š1XXXXXX0
+    SPI.transfer(((addr<<1)&0x7E) | 0x80);
+    val =SPI.transfer(0x00);
+
+    digitalWrite(chipSelectPin, HIGH);
+    return val;
 }
 
 /*
@@ -213,7 +213,7 @@ uchar Read_MFRC522(uchar addr)
  * Input parameters: reg - register address; mask - set value
  * Return value: None
  */
-void SetBitMask(uchar reg, uchar mask)  
+void SetBitMask(uchar reg, uchar mask)
 {
     uchar tmp;
     tmp = Read_MFRC522(reg);
@@ -227,12 +227,12 @@ void SetBitMask(uchar reg, uchar mask)
  * Input parameters: reg - register address; mask - clear bit value
  * Return value: None
 */
-void ClearBitMask(uchar reg, uchar mask)  
+void ClearBitMask(uchar reg, uchar mask)
 {
     uchar tmp;
     tmp = Read_MFRC522(reg);
     Write_MFRC522(reg, tmp & (~mask));  // clear bit mask
-} 
+}
 
 
 /*
@@ -243,13 +243,13 @@ void ClearBitMask(uchar reg, uchar mask)
  */
 void AntennaOn(void)
 {
-	uchar temp;
+    uchar temp;
 
-	temp = Read_MFRC522(TxControlReg);
-	if (!(temp & 0x03))
-	{
-		SetBitMask(TxControlReg, 0x03);
-	}
+    temp = Read_MFRC522(TxControlReg);
+    if (!(temp & 0x03))
+    {
+        SetBitMask(TxControlReg, 0x03);
+    }
 }
 
 
@@ -261,7 +261,7 @@ void AntennaOn(void)
  */
 void AntennaOff(void)
 {
-	ClearBitMask(TxControlReg, 0x03);
+    ClearBitMask(TxControlReg, 0x03);
 }
 
 
@@ -285,24 +285,24 @@ void MFRC522_Reset(void)
 */
 void MFRC522_Init(void)
 {
-	digitalWrite(NRSTPD,HIGH);
+    digitalWrite(NRSTPD,HIGH);
 
-	MFRC522_Reset();
-	 	
-	//Timer: TPrescaler*TreloadVal/6.78MHz = 24ms
+    MFRC522_Reset();
+
+    //Timer: TPrescaler*TreloadVal/6.78MHz = 24ms
     Write_MFRC522(TModeReg, 0x8D);		//Tauto=1; f(Timer) = 6.78MHz/TPreScaler
     Write_MFRC522(TPrescalerReg, 0x3E);	//TModeReg[3..0] + TPrescalerReg
-    Write_MFRC522(TReloadRegL, 30);           
+    Write_MFRC522(TReloadRegL, 30);
     Write_MFRC522(TReloadRegH, 0);
-	
-	Write_MFRC522(TxAutoReg, 0x40);		//100%ASK
-	Write_MFRC522(ModeReg, 0x3D);		//CRC Initial value 0x6363	???///comentar
 
-	//ClearBitMask(Status2Reg, 0x08);		//MFCrypto1On=0
-	//Write_MFRC522(RxSelReg, 0x86);		//RxWait = RxSelReg[5..0]
-	//Write_MFRC522(RFCfgReg, 0x7F);   		//RxGain = 48dB
+    Write_MFRC522(TxAutoReg, 0x40);		//100%ASK
+    Write_MFRC522(ModeReg, 0x3D);		//CRC Initial value 0x6363	???///comentar
 
-	AntennaOn();		//Open the antenna
+    //ClearBitMask(Status2Reg, 0x08);		//MFCrypto1On=0
+    //Write_MFRC522(RxSelReg, 0x86);		//RxWait = RxSelReg[5..0]
+    //Write_MFRC522(RFCfgReg, 0x7F);   		//RxGain = 48dB
+
+    AntennaOn();		//Open the antenna
         delay(150);
 }
 
@@ -321,20 +321,20 @@ void MFRC522_Init(void)
  */
 uchar MFRC522_Request(uchar reqMode, uchar *TagType)
 {
-	uchar status;  
-	uint backBits;			//The received data bits
+    uchar status;
+    uint backBits;			//The received data bits
 
-	Write_MFRC522(BitFramingReg, 0x07);		//TxLastBists = BitFramingReg[2..0]	???
-	
-	TagType[0] = reqMode;
-	status = MFRC522_ToCard(PCD_TRANSCEIVE, TagType, 1, TagType, &backBits);
+    Write_MFRC522(BitFramingReg, 0x07);		//TxLastBists = BitFramingReg[2..0]	???
 
-	if ((status != MI_OK) || (backBits != 0x10))
-	{    
-		status = MI_ERR;
-	}
-   
-	return status;
+    TagType[0] = reqMode;
+    status = MFRC522_ToCard(PCD_TRANSCEIVE, TagType, 1, TagType, &backBits);
+
+    if ((status != MI_OK) || (backBits != 0x10))
+    {
+        status = MI_ERR;
+    }
+
+    return status;
 }
 
 
@@ -343,7 +343,7 @@ uchar MFRC522_Request(uchar reqMode, uchar *TagType)
  * Description: RC522 and ISO14443 card communication
  * Input Parameters: command - MF522 command word,
  *			 sendData--RC522 sent to the card by the data
- *			 sendLen--Length of data sent	 
+ *			 sendLen--Length of data sent
  *			 backData--Received the card returns data,
  *			 backLen--Return data bit length
  * Return value: the successful return MI_OK
@@ -360,101 +360,101 @@ uchar MFRC522_ToCard(uchar command, uchar *sendData, uchar sendLen, uchar *backD
     switch (command)
     {
         case PCD_AUTHENT:		//Certification cards close
-		{
-			irqEn = 0x12;
-			waitIRq = 0x10;
-			break;
-		}
-		case PCD_TRANSCEIVE:	//Transmit FIFO data
-		{
-			irqEn = 0x77;
-			waitIRq = 0x30;
-			break;
-		}
-		default:
-			break;
+        {
+            irqEn = 0x12;
+            waitIRq = 0x10;
+            break;
+        }
+        case PCD_TRANSCEIVE:	//Transmit FIFO data
+        {
+            irqEn = 0x77;
+            waitIRq = 0x30;
+            break;
+        }
+        default:
+            break;
     }
-   
+
     Write_MFRC522(CommIEnReg, irqEn|0x80);	//Interrupt request
     ClearBitMask(CommIrqReg, 0x80);			//Clear all interrupt request bit
     SetBitMask(FIFOLevelReg, 0x80);			//FlushBuffer=1, FIFO Initialization
-    
-  	Write_MFRC522(CommandReg, PCD_IDLE);	//NO action; Cancel the current command???
 
-	//Writing data to the FIFO
+    Write_MFRC522(CommandReg, PCD_IDLE);	//NO action; Cancel the current command???
+
+    //Writing data to the FIFO
     for (i=0; i<sendLen; i++)
-    {   
-		Write_MFRC522(FIFODataReg, sendData[i]);    
-	}
-
-	//Execute the command
-	Write_MFRC522(CommandReg, command);
-    if (command == PCD_TRANSCEIVE)
-    {    
-		SetBitMask(BitFramingReg, 0x80);		//StartSend=1,transmission of data starts  
-	}   
-    
-	//Waiting to receive data to complete
-	i = 2000;	//i according to the clock frequency adjustment, the operator M1 card maximum waiting time 25ms???
-    do 
     {
-		//CommIrqReg[7..0]
-		//Set1 TxIRq RxIRq IdleIRq HiAlerIRq LoAlertIRq ErrIRq TimerIRq
+        Write_MFRC522(FIFODataReg, sendData[i]);
+    }
+
+    //Execute the command
+    Write_MFRC522(CommandReg, command);
+    if (command == PCD_TRANSCEIVE)
+    {
+        SetBitMask(BitFramingReg, 0x80);		//StartSend=1,transmission of data starts
+    }
+
+    //Waiting to receive data to complete
+    i = 2000;	//i according to the clock frequency adjustment, the operator M1 card maximum waiting time 25ms???
+    do
+    {
+        //CommIrqReg[7..0]
+        //Set1 TxIRq RxIRq IdleIRq HiAlerIRq LoAlertIRq ErrIRq TimerIRq
         n = Read_MFRC522(CommIrqReg);
         i--;
     }
     while ((i!=0) && !(n&0x01) && !(n&waitIRq));
 
     ClearBitMask(BitFramingReg, 0x80);			//StartSend=0
-	
+
     if (i != 0)
-    {    
+    {
         if(!(Read_MFRC522(ErrorReg) & 0x1B))	//BufferOvfl Collerr CRCErr ProtecolErr
         {
             status = MI_OK;
             if (n & irqEn & 0x01)
-            {   
-				status = MI_NOTAGERR;			//??   
-			}
+            {
+                status = MI_NOTAGERR;			//??
+            }
 
             if (command == PCD_TRANSCEIVE)
             {
-               	n = Read_MFRC522(FIFOLevelReg);
-              	lastBits = Read_MFRC522(ControlReg) & 0x07;
+                n = Read_MFRC522(FIFOLevelReg);
+                lastBits = Read_MFRC522(ControlReg) & 0x07;
                 if (lastBits)
-                {   
-					*backLen = (n-1)*8 + lastBits;   
-				}
+                {
+                    *backLen = (n-1)*8 + lastBits;
+                }
                 else
-                {   
-					*backLen = n*8;   
-				}
+                {
+                    *backLen = n*8;
+                }
 
                 if (n == 0)
-                {   
-					n = 1;    
-				}
+                {
+                    n = 1;
+                }
                 if (n > MAX_LEN)
-                {   
-					n = MAX_LEN;   
-				}
-				
-				//Reading the received data in FIFO
+                {
+                    n = MAX_LEN;
+                }
+
+                //Reading the received data in FIFO
                 for (i=0; i<n; i++)
-                {   
-					backData[i] = Read_MFRC522(FIFODataReg);    
-				}
+                {
+                    backData[i] = Read_MFRC522(FIFODataReg);
+                }
             }
         }
         else
-        {   
-			status = MI_ERR;  
-		}
-        
+        {
+            status = MI_ERR;
+        }
+
     }
-	
+
     //SetBitMask(ControlReg,0x80);           //timer stops
-    //Write_MFRC522(CommandReg, PCD_IDLE); 
+    //Write_MFRC522(CommandReg, PCD_IDLE);
 
     return status;
 }
@@ -470,35 +470,35 @@ uchar MFRC522_Anticoll(uchar *serNum)
 {
     uchar status;
     uchar i;
-	uchar serNumCheck=0;
+    uchar serNumCheck=0;
     uint unLen;
-    
+
 
     //ClearBitMask(Status2Reg, 0x08);		//TempSensclear
     //ClearBitMask(CollReg,0x80);			//ValuesAfterColl
-	Write_MFRC522(BitFramingReg, 0x00);		//TxLastBists = BitFramingReg[2..0]
- 
+    Write_MFRC522(BitFramingReg, 0x00);		//TxLastBists = BitFramingReg[2..0]
+
     serNum[0] = PICC_ANTICOLL;
     serNum[1] = 0x20;
     status = MFRC522_ToCard(PCD_TRANSCEIVE, serNum, 2, serNum, &unLen);
 
     if (status == MI_OK)
-	{
-		//Check card serial number
-		for (i=0; i<4; i++)
-		{   
-		 	serNumCheck ^= serNum[i];
-		}
-		if (serNumCheck != serNum[i])
-		{   
-			status = MI_ERR;    
-		}
+    {
+        //Check card serial number
+        for (i=0; i<4; i++)
+        {
+            serNumCheck ^= serNum[i];
+        }
+        if (serNumCheck != serNum[i])
+        {
+            status = MI_ERR;
+        }
     }
 
     //SetBitMask(CollReg, 0x80);		//ValuesAfterColl=1
 
     return status;
-} 
+}
 
 
 /*
@@ -515,23 +515,23 @@ void CalulateCRC(uchar *pIndata, uchar len, uchar *pOutData)
     SetBitMask(FIFOLevelReg, 0x80);			//Clear the FIFO pointer
     //Write_MFRC522(CommandReg, PCD_IDLE);
 
-	//Writing data to the FIFO	
+    //Writing data to the FIFO
     for (i=0; i<len; i++)
-    {   
-		Write_MFRC522(FIFODataReg, *(pIndata+i));   
-	}
+    {
+        Write_MFRC522(FIFODataReg, *(pIndata+i));
+    }
     Write_MFRC522(CommandReg, PCD_CALCCRC);
 
-	//Wait CRC calculation is complete
+    //Wait CRC calculation is complete
     i = 0xFF;
-    do 
+    do
     {
         n = Read_MFRC522(DivIrqReg);
         i--;
     }
     while ((i!=0) && !(n&0x04));			//CRCIrq = 1
 
-	//Read CRC calculation result
+    //Read CRC calculation result
     pOutData[0] = Read_MFRC522(CRCResultRegL);
     pOutData[1] = Read_MFRC522(CRCResultRegM);
 }
@@ -546,30 +546,30 @@ void CalulateCRC(uchar *pIndata, uchar len, uchar *pOutData)
 uchar MFRC522_SelectTag(uchar *serNum)
 {
     uchar i;
-	uchar status;
-	uchar size;
+    uchar status;
+    uchar size;
     uint recvBits;
-    uchar buffer[9]; 
+    uchar buffer[9];
 
-	//ClearBitMask(Status2Reg, 0x08);			//MFCrypto1On=0
+    //ClearBitMask(Status2Reg, 0x08);			//MFCrypto1On=0
 
     buffer[0] = PICC_SElECTTAG;
     buffer[1] = 0x70;
     for (i=0; i<5; i++)
     {
-    	buffer[i+2] = *(serNum+i);
+        buffer[i+2] = *(serNum+i);
     }
-	CalulateCRC(buffer, 7, &buffer[7]);		//??
+    CalulateCRC(buffer, 7, &buffer[7]);		//??
     status = MFRC522_ToCard(PCD_TRANSCEIVE, buffer, 9, buffer, &recvBits);
-    
+
     if ((status == MI_OK) && (recvBits == 0x18))
-    {   
-		size = buffer[0]; 
-	}
+    {
+        size = buffer[0];
+    }
     else
-    {   
-		size = 0;    
-	}
+    {
+        size = 0;
+    }
 
     return size;
 }
@@ -591,26 +591,26 @@ uchar MFRC522_Auth(uchar authMode, uchar BlockAddr, uchar *Sectorkey, uchar *ser
     uchar status;
     uint recvBits;
     uchar i;
-	uchar buff[12]; 
+    uchar buff[12];
 
-	//Verify the command block address + sector + password + card serial number
+    //Verify the command block address + sector + password + card serial number
     buff[0] = authMode;
     buff[1] = BlockAddr;
     for (i=0; i<6; i++)
-    {    
-		buff[i+2] = *(Sectorkey+i);   
-	}
+    {
+        buff[i+2] = *(Sectorkey+i);
+    }
     for (i=0; i<4; i++)
-    {    
-		buff[i+8] = *(serNum+i);   
-	}
+    {
+        buff[i+8] = *(serNum+i);
+    }
     status = MFRC522_ToCard(PCD_AUTHENT, buff, 12, buff, &recvBits);
 
     if ((status != MI_OK) || (!(Read_MFRC522(Status2Reg) & 0x08)))
-    {   
-		status = MI_ERR;   
-	}
-    
+    {
+        status = MI_ERR;
+    }
+
     return status;
 }
 
@@ -634,7 +634,7 @@ uchar MFRC522_Read(uchar blockAddr, uchar *recvData)
     {
         status = MI_ERR;
     }
-    
+
     return status;
 }
 
@@ -650,33 +650,33 @@ uchar MFRC522_Write(uchar blockAddr, uchar *writeData)
     uchar status;
     uint recvBits;
     uchar i;
-	uchar buff[18]; 
-    
+    uchar buff[18];
+
     buff[0] = PICC_WRITE;
     buff[1] = blockAddr;
     CalulateCRC(buff, 2, &buff[2]);
     status = MFRC522_ToCard(PCD_TRANSCEIVE, buff, 4, buff, &recvBits);
 
     if ((status != MI_OK) || (recvBits != 4) || ((buff[0] & 0x0F) != 0x0A))
-    {   
-		status = MI_ERR;   
-	}
-        
+    {
+        status = MI_ERR;
+    }
+
     if (status == MI_OK)
     {
         for (i=0; i<16; i++)		//Data to the FIFO write 16Byte
-        {    
-        	buff[i] = *(writeData+i);   
+        {
+            buff[i] = *(writeData+i);
         }
         CalulateCRC(buff, 16, &buff[16]);
         status = MFRC522_ToCard(PCD_TRANSCEIVE, buff, 18, buff, &recvBits);
-        
-		if ((status != MI_OK) || (recvBits != 4) || ((buff[0] & 0x0F) != 0x0A))
-        {   
-			status = MI_ERR;   
-		}
+
+        if ((status != MI_OK) || (recvBits != 4) || ((buff[0] & 0x0F) != 0x0A))
+        {
+            status = MI_ERR;
+        }
     }
-    
+
     return status;
 }
 
@@ -689,14 +689,14 @@ uchar MFRC522_Write(uchar blockAddr, uchar *writeData)
  */
 void MFRC522_Halt(void)
 {
-	uchar status;
+    uchar status;
     uint unLen;
-    uchar buff[4]; 
+    uchar buff[4];
 
     buff[0] = PICC_HALT;
     buff[1] = 0;
     CalulateCRC(buff, 2, &buff[2]);
- 
+
     status = MFRC522_ToCard(PCD_TRANSCEIVE, buff, 4, buff,&unLen);
 }
 
@@ -718,17 +718,17 @@ void Read_Zone(uint zone)
        Serial.print(" da zona ");
        Serial.print(zone);
        Serial.println(" efetuada com sucesso");
-       }  
+       }
   }
  else
     {
       if(PC){
         Serial.print("Problemas na leitura  ");
-        Serial.println(status); 
+        Serial.println(status);
       }
-    } 
- } 
-  
+    }
+ }
+
 }
 
 void Read_Tag()
@@ -736,7 +736,7 @@ void Read_Tag()
   uchar tmp, checksum1;
   uchar str[MAX_LEN];
   int length=1024;
-  uchar status;   
+  uchar status;
   for(int i=0;i<16;i++)
     {
           status= MFRC522_Auth(0x60, i*4,&sectorKey[0], &serNum[0]);
@@ -749,7 +749,7 @@ void Read_Tag()
             }
             Read_Zone(i);
            // for(int i=0;i<length_data_picc;i++)
-           
+
           }
           else{
             if(PC){
@@ -757,8 +757,8 @@ void Read_Tag()
             }
           length=(i+1)*4*16;
           i=17;
-          }                 
-	}
+          }
+    }
  if(PC){
     for(int i=0;i<length;i++){
      if(i%16==0)
@@ -783,13 +783,13 @@ int  Write_Block(int block)
   status=MFRC522_Write(block, &data_write_picc[0]);
   if(status==MI_OK){
     if(PC){
-     Serial.println("Escrita realizada com sucesso"); 
+     Serial.println("Escrita realizada com sucesso");
     }
     return 1;
   }
   else {
     if(PC){
-     Serial.println("Problemas na escrita"); 
+     Serial.println("Problemas na escrita");
     }
     return -1;
   }
@@ -798,10 +798,10 @@ int  Write_Block(int block)
 }
 
 int Write_Tag(){
- 
+
  uchar status;
  if(PC){
-   Serial.println("teste de escrita"); 
+   Serial.println("teste de escrita");
  }
  int block=0;
  block=(int)n_of_block;
@@ -818,23 +818,23 @@ int Write_Tag(){
     else{
       if(PC){
         Serial.println("Problemas ao autentificar o cartao");
-      }  
+      }
       return -1;
-     }    
-  
+     }
+
 }
 
 
 
 int Write_Command(){
-  
- 
+
+
  MFRC522_Init();
  delay(50);
  uchar i,tmp, checksum1;
  uchar str[MAX_LEN];
  uchar status;
-  status = MFRC522_Request(PICC_REQIDL, str);	
+  status = MFRC522_Request(PICC_REQIDL, str);
    if (status == MI_OK)
   {
     if(PC){
@@ -847,7 +847,7 @@ int Write_Command(){
       Serial.println("Erro no Request MRF522");
     }
     //return 0;
-  } 
+  }
   status = MFRC522_Anticoll(str);
    memcpy(serNum, str, 5);
    if (status == MI_OK)
@@ -860,7 +860,7 @@ int Write_Command(){
     if(status!=0){
       if(PC){
         Serial.println("Agora a escrita");
-      }  
+      }
       return Write_Tag();
     }
       else{
@@ -868,7 +868,7 @@ int Write_Command(){
          Serial.println("Problemas ao selecionar o cartao");
         }
        return 0;
-      }  
+      }
     }
    else{
        if(PC){
@@ -879,11 +879,11 @@ int Write_Command(){
   MFRC522_Halt();
   AntennaOff();
   delay(50);
-  return 1;  
+  return 1;
 }
 
 void serialEvent() {
- if(PC){ 
+ if(PC){
    Serial.println("Fuction event with control_buf = ");
  }
  buffer_receive[control_buffer]=Serial.read();
@@ -905,20 +905,21 @@ void serialEvent() {
      Clean_Buffer();
    }
  if(control_buffer>=4)
-      Check_Command();  
- 
-  
+      Check_Command();
+
+
 }
 
 
 
 void Check_Command(){
-  
-  if(buffer_receive[0]=='"' && buffer_receive[1]=='R' && buffer_receive[2]=='r' &&buffer_receive[3]=='"') 
+
+  if(buffer_receive[0]=='"' && buffer_receive[1]=='R' && buffer_receive[2]=='r' &&buffer_receive[3]=='"')
   {
     //Solicitaço de leitura
     Serial.println("\"AK\"");
     control_escrita=0;
+    control_leitura=0;
     Actual_Command='R';
   }
   else if(buffer_receive[0]=='"' && buffer_receive[1]=='W' && buffer_receive[2]=='r' &&buffer_receive[3]=='"')
@@ -940,7 +941,7 @@ void Check_Command(){
           Send_Data();
           }
           else{
-           Serial.println("\"NK\""); 
+           Serial.println("\"NK\"");
           }
         }
    else if(buffer_receive[0]=='"' && buffer_receive[1]=='A' && buffer_receive[2]=='K' && buffer_receive[3]=='"' && control_leitura>0)
@@ -949,8 +950,8 @@ void Check_Command(){
            {
                control_leitura--;
                Send_Data();
-           } 
-  
+           }
+
    else if(buffer_receive[0]=='"' && buffer_receive[1]=='W' && buffer_receive[2]=='"' && Actual_Command=='W')
           {
            //Comando de escrita
@@ -959,7 +960,7 @@ void Check_Command(){
              }
            n_of_block=buffer_receive[3];
            control_escrita=1;
-           
+
           }
     else if(control_escrita>=1 && Actual_Command=='W'){
           if(PC){
@@ -975,21 +976,21 @@ void Check_Command(){
              for(int a=0;a<16;a++)
                 Serial.print(char(data_write_picc[a]));
              Serial.print("   na posicao ");
-             Serial.println(int(n_of_block)); 
+             Serial.println(int(n_of_block));
             }
             if(Write_Command()){
               Serial.println("\"AK\"");
               if(PC){
-               Serial.println("Escrita efetuada com sucesso"); 
+               Serial.println("Escrita efetuada com sucesso");
               }
             }
             else{
-             Serial.println("\"NK\""); 
+             Serial.println("\"NK\"");
             }
             control_escrita=0;
             Actual_Command='N';
           }
-      
+
     }
    else if(buffer_receive[0]=='"' && buffer_receive[1]=='Q' && buffer_receive[2]=='.' && buffer_receive[3]=='"'){
     if(PC){
@@ -997,7 +998,7 @@ void Check_Command(){
     }
     Serial.println("\"AK\"");
     control_leitura=0;
-    control_escrita=0; 
+    control_escrita=0;
     Actual_Command='N';
    }
    else if (Actual_Command =='N')
@@ -1012,12 +1013,12 @@ void Check_Command(){
 void Clean_Buffer(){
   control_buffer=0;
   for(int i=0;i<64;i++)
-    buffer_receive[i]=0x00;  
+    buffer_receive[i]=0x00;
 }
 
 int Read_Command(){
-  
- 
+
+
  MFRC522_Init();
  delay(50);
  uchar i,tmp, checksum1;
@@ -1025,8 +1026,8 @@ int Read_Command(){
  uchar status;
  uint length_data_picc = 1000;
  for(int i =0 ; i<1024;i++)
-   data_read_picc[i]=0xFE;   
-  status = MFRC522_Request(PICC_REQIDL, str);	
+   data_read_picc[i]=0xFE;
+  status = MFRC522_Request(PICC_REQIDL, str);
    if (status == MI_OK)
   {
     if(PC){
@@ -1039,7 +1040,7 @@ int Read_Command(){
       Serial.println("Erro no Request MRF522");
     }
     //return 0;
-  } 
+  }
   status = MFRC522_Anticoll(str);
    memcpy(serNum, str, 5);
    if (status == MI_OK)
@@ -1052,7 +1053,7 @@ int Read_Command(){
     if(status!=0){
       if(PC){
         Serial.println("Agora a leitura");
-      }  
+      }
       Read_Tag();
     }
       else{
@@ -1060,7 +1061,7 @@ int Read_Command(){
          Serial.println("Problemas ao selecionar o cartao");
         }
        return 0;
-      }  
+      }
     }
    else{
        if(PC){
@@ -1071,7 +1072,7 @@ int Read_Command(){
   MFRC522_Halt();
   AntennaOff();
   delay(50);
-  return 1;  
+  return 1;
 }
 
 void Send_Data(){
@@ -1097,7 +1098,6 @@ void Send_Data(){
    Serial.println("END"); ;// PRECISO PREPARAR A MENSAGEM CERTA A SER ENVIADA
    control_leitura=0;
  }
- 
-}
 
+}
 
